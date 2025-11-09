@@ -1,0 +1,156 @@
+ <!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>NEON TRADER .ORG</title>
+<style>
+body { margin:0; font-family:'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff;}
+h1 { text-align:center; font-size:3em; color:#00ffc8; text-shadow:0 0 25px #00fff2,0 0 10px #008b6f; margin:20px 0 5px;}
+h2 { text-align:center; font-weight:300; color:#ffc300; margin-top:0; text-shadow:0 0 10px #ffc300;}
+#livePriceContainer { text-align:center; margin-top:15px; }
+#btcLivePrice { font-size:2em; font-weight:bold; color:#00ff88; text-shadow:0 0 10px #00fff2; }
+.table-container { max-width:1200px; margin:30px auto; background: rgba(0,0,0,0.3); border-radius:15px; overflow-y:auto; max-height:400px; backdrop-filter:blur(6px); padding:10px;}
+table { width:100%; border-collapse:collapse; color:#fff; font-size:0.95em;}
+thead th { position:sticky; top:0; background: rgba(0,255,200,0.15); padding:10px 6px; border-bottom:2px solid rgba(0,255,200,0.5);}
+td { text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);}
+.bull { color:#4caf50; font-weight:bold; }
+.bear { color:#f44336; font-weight:bold; }
+#searchContainer { text-align:center; margin:15px 0; }
+#searchInput { padding:6px 10px; border-radius:8px; border:none; outline:none; font-size:1em; }
+#introMessage { text-align:center; margin:40px auto; max-width:1000px; color:#00ff88; font-size:1.4em; }
+#infoSection { max-width:1000px; margin:30px auto; background: rgba(0,0,0,0.25); padding:20px; border-radius:15px; box-shadow:0 0 15px rgba(0,255,200,0.2); line-height:1.6; }
+#infoSection h3 { color:#00ff88; }
+#startBtn { display:block; margin:40px auto; background:linear-gradient(90deg,#00ffc8,#00a2ff); color:#000; border:none; padding:20px 60px; font-size:1.3em; border-radius:50px; cursor:pointer; font-weight:bold; box-shadow:0 0 25px #00ffc8; transition:all 0.3s ease;}
+#startBtn:hover { transform: scale(1.08); box-shadow:0 0 45px #00fff2,0 0 25px #00ffc8 inset; }
+footer { text-align:center; margin:50px 0 20px; font-size:0.9em; color:#00ff88; text-shadow:0 0 5px #00fff2;}
+</style>
+</head>
+<body>
+
+<h1>NEON TRADER .ORG</h1>
+<h2>Bitcoin Dashboard Live – Date simulate și aproximativ reale</h2>
+
+<div id="livePriceContainer">
+  BTC Price: <span id="btcLivePrice">Încărcare...</span>
+</div>
+
+<div id="introMessage">
+<strong>Aşa a început totul:</strong> de la ideea unui sistem monetar descentralizat până la revoluţia digitală a finanţelor personale.
+</div>
+
+<div id="infoSection">
+<h3>Informaţii utile pentru începători:</h3>
+<ol>
+<li><strong>Ce este Bitcoin (BTC):</strong> prima criptomonedă descentralizată, lansată în 2009 de Satoshi Nakamoto. ([wikipedia](https://en.wikipedia.org/wiki/History_of_bitcoin))</li>
+<li><strong>De ce este volatilă:</strong> fluctuaţiile mari vin din cerere/scădere, lichiditate mică, ştiri şi reglementări. ([99bitcoins](https://99bitcoins.com/cryptocurrency/bitcoin/historical-price/))</li>
+<li><strong>Alegerea strategiei:</strong> trading activ vs holding pe termen lung; cunoaşterea riscului este esenţială.</li>
+<li><strong>Analiza grafică:</strong> învaţă să interpretezi lumânările (candlesticks), volumele, trendurile.</li>
+<li><strong>Evenimente marcante:</strong>
+  <ul>
+    <li>Prima tranzacţie comercială: 10 000 BTC pentru două pizza în 2010 – „Pizza Day”.</li>
+    <li>Primul halving al Bitcoin‑ului: în 2012.</li>
+    <li>Adopţii importante: PayPal, Tesla, diverse exchange-uri.</li>
+  </ul>
+</li>
+<li><strong>Educaţia continuă:</strong> utilizează simulatoare înainte să investeşti bani reali şi urmăreşte ştiri, reglementări şi blockchain.</li>
+<li><strong>Securitatea:</strong> portofele sigure, 2FA, înţelege riscurile de pierdere sau hack.</li>
+</ol>
+</div>
+
+<div id="searchContainer">
+  <input id="searchInput" placeholder="Caută ziua X..." />
+  <button onclick="searchDay()">Go</button>
+</div>
+
+<div class="table-container">
+<table id="btcTable">
+<thead>
+<tr>
+<th>Ziua</th>
+<th>Data</th>
+<th>Open</th>
+<th>High</th>
+<th>Low</th>
+<th>Close</th>
+<th>Volume</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<button id="startBtn" onclick="window.location.href='simulator.html'">
+💸 Începe să înveți prin joc
+</button>
+
+<footer>
+NEON TRADER in colaborare cu JasAnalitics.org – Toate drepturile rezervate
+</footer>
+
+<script>
+// Generare date simulate BTC
+const btcDataSim = [];
+let startDate = new Date(2009,0,1);
+const today = new Date();
+let dayCount = 1;
+let lastPrice = 0.05;
+while(startDate <= today){
+  let volatility = 0.05 + Math.random()*0.05;
+  let change = lastPrice*(Math.random()*2*volatility - volatility);
+  let open = lastPrice;
+  let close = Math.max(0.01, open+change);
+  let high = Math.max(open,close)*(1+Math.random()*0.02);
+  let low = Math.min(open,close)*(1-Math.random()*0.02);
+  let volume = Math.random()*10000 + 500;
+  btcDataSim.push({zi: dayCount,date:startDate.toISOString().split('T')[0],open,high,low,close,volume});
+  lastPrice = close;
+  startDate.setDate(startDate.getDate()+1);
+  dayCount++;
+}
+
+// populare tabel
+const tbody = document.querySelector("#btcTable tbody");
+btcDataSim.forEach(day=>{
+  const tr = document.createElement("tr");
+  tr.id = "day-"+day.zi;
+  tr.innerHTML=`
+    <td>${day.zi}</td>
+    <td>${day.date}</td>
+    <td>${day.open.toFixed(2)}</td>
+    <td>${day.high.toFixed(2)}</td>
+    <td>${day.low.toFixed(2)}</td>
+    <td class="${day.close>=day.open?'bull':'bear'}">${day.close.toFixed(2)}</td>
+    <td>${day.volume.toFixed(2)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// cautare zi
+function searchDay(){
+  const input = document.getElementById("searchInput").value;
+  const index = parseInt(input.replace(/\D/g,''),10);
+  if(!index) return;
+  const row = document.getElementById(`day-${index}`);
+  if(!row) return;
+  row.scrollIntoView({behavior:"smooth", block:"center"});
+  row.style.background = "rgba(255,255,0,0.5)";
+  setTimeout(()=>row.style.background="",2000);
+}
+
+// Preț live BTC
+async function fetchLiveBTCPrice(){
+  try{
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+    const data = await res.json();
+    document.getElementById("btcLivePrice").textContent = "$"+data.bitcoin.usd.toLocaleString();
+  }catch(err){
+    console.error("Eroare la prețul live BTC:", err);
+    document.getElementById("btcLivePrice").textContent = "N/A";
+  }
+}
+fetchLiveBTCPrice();
+setInterval(fetchLiveBTCPrice,10000);
+</script>
+
+</body>
+</html>
