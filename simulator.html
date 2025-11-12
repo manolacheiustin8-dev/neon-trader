@@ -2,265 +2,166 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NEON TRADER SIMULATOR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON TRADER — Simulator Ultra-Real</title>
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
-<!-- Favicon neon -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-<rect width='100' height='100' rx='20' fill='black'/>
-<text x='50' y='62' font-size='45' text-anchor='middle' fill='#00ffc8' font-family='Orbitron'>N</text>
-</svg>">
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='black'/><text x='50' y='62' font-size='45' text-anchor='middle' fill='#00ffc8' font-family='Orbitron'>N</text></svg>">
 
 <style>
 :root{
-  --bg:#071018;
-  --panel:#081522cc;
-  --neon-green:#00ff9c;
-  --neon-gold:#ffd166;
-  --neon-blue:#37b8ff;
-  --muted:#9aa7b2;
-  --glass-border: 1px solid rgba(255,255,255,0.04);
-  --radius:12px;
+  --bg-gradient: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  --neon-cyan:#00ffc8;
+  --neon-green:#00ff88;
+  --neon-gold:#ffc300;
+  --glass-bg: rgba(0,0,0,0.25);
+  --glass-blur: blur(6px);
+  --radius:15px;
 }
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,#02060b 0%, #071018 100%);font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; color:#e6f0f3; -webkit-font-smoothing:antialiased;}
-h1{font-family:Orbitron, Inter; font-weight:800; color:var(--neon-gold); margin:18px 0 8px; text-align:center; letter-spacing:1px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg-gradient);color:#fff;scroll-behavior:smooth;}
+h1{text-align:center;font-size:2.5em;color:var(--neon-cyan);text-shadow:0 0 25px #00fff2,0 0 10px #008b6f;margin:20px 0;}
+h2{text-align:center;font-weight:300;color:var(--neon-gold);text-shadow:0 0 10px var(--neon-gold);margin-bottom:15px;}
 
-/* App layout */
-#app{display:flex;height:calc(100vh - 40px);width:calc(100vw - 40px);margin:20px;gap:18px}
-#left{flex:1.9;display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02)}
-#right{flex:0.95;background:var(--panel);border-radius:var(--radius);padding:18px; display:flex;flex-direction:column; gap:12px; border:var(--glass-border); box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+/* Layout */
+#container{max-width:1400px;margin:0 auto;padding:20px;display:flex;flex-wrap:wrap;gap:20px;}
+#left{flex:1 1 60%;background:var(--glass-bg);backdrop-filter:var(--glass-blur);border-radius:var(--radius);padding:15px;display:flex;flex-direction:column;min-height:500px;position:relative;}
+#right{flex:1 1 35%;background:var(--glass-bg);backdrop-filter:var(--glass-blur);border-radius:var(--radius);padding:15px;display:flex;flex-direction:column;gap:15px;min-height:500px;}
 
-/* Header & branding */
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));border-bottom:1px solid rgba(255,255,255,0.02)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--neon-green),var(--neon-gold));display:flex;align-items:center;justify-content:center;color:#021;font-weight:800; box-shadow:0 4px 18px rgba(0,255,156,0.1), 0 0 20px rgba(255,209,102,0.05)}
-.brand h1{font-size:16px;margin:0;color:var(--neon-gold)}
-.header .meta{color:var(--muted);font-size:13px}
+/* Chart */
+#chart{width:100%;height:400px;background:rgba(0,0,0,0.1);border-radius:var(--radius);position:relative;}
+.topControls{display:flex;gap:10px;margin-bottom:8px}
+.select,.input,.smallBtn{padding:6px 10px;border-radius:8px;border:none;outline:none;font-size:0.9em;}
+.select,.smallBtn{background:rgba(0,0,0,0.3);color:#fff;cursor:pointer;}
+.input{background:rgba(0,0,0,0.2);color:var(--neon-gold);}
 
-/* Chart container */
-#chartWrap{flex:1;position:relative;background:linear-gradient(180deg,rgba(255,255,255,0.01), rgba(255,255,255,0.00));}
-#chart{width:100%;height:100%;display:block}
-.topControls{position:absolute;top:12px;left:12px;display:flex;gap:10px;z-index:20}
-.select, .smallBtn{background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:var(--muted);font-size:13px;backdrop-filter: blur(6px);}
-.smallBtn{cursor:pointer}
-.smallBtn:hover{box-shadow:0 6px 20px rgba(0,0,0,0.5)}
+/* Buttons */
+.btnBuy{background:linear-gradient(90deg,var(--neon-green),#5dffb1);color:#021;font-weight:700;padding:10px;border-radius:10px;border:none;cursor:pointer;flex:1;}
+.btnSell{background:linear-gradient(90deg,#ff6b6b,#f44336);color:#fff;font-weight:700;padding:10px;border-radius:10px;border:none;cursor:pointer;flex:1;}
+.btn:hover{transform:scale(1.05);transition:all 0.2s ease;}
 
-/* Right panel */
-.panelCard{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); padding:14px; border-radius:10px;}
-.balance{font-weight:700;font-size:18px;color:var(--neon-gold); text-align:center; padding:12px; border-radius:10px; background:linear-gradient(0deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); box-shadow: inset 0 -6px 30px rgba(0,0,0,0.4)}
-.kpi{display:flex;gap:10px;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px}
+/* Balance & KPIs */
+.balance{background:rgba(0,0,0,0.2);padding:12px;border-radius:var(--radius);text-align:center;font-weight:700;font-size:1.1em;}
+.kpi{display:flex;justify-content:space-between;color:#ccc;font-size:0.9em;margin-top:6px;}
 
-/* Trade box */
-.tradeBox{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-.input, .select{width:100%}
-.input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--neon-gold);font-weight:600;font-size:14px}
-.actionRow{display:flex;gap:10px}
-.btn{flex:1;padding:11px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,0.5);transition:transform .12s ease, box-shadow .12s ease;}
-.btn:active{transform:translateY(1px)}
-.btnBuy{background:linear-gradient(90deg,var(--neon-green), #5dffb1); color:#022; text-shadow:0 1px 0 rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,255,156,0.12), 0 0 28px rgba(0,255,156,0.06)}
-.btnSell{background:linear-gradient(90deg,#ff6b6b, #f44336); color:#fff; box-shadow:0 8px 30px rgba(244,67,54,0.10)}
+/* Trade History */
+#history{flex:1;overflow:auto;background:rgba(0,0,0,0.1);padding:10px;border-radius:var(--radius);}
+.historyRow{display:flex;justify-content:space-between;padding:8px;margin-bottom:5px;background:rgba(0,0,0,0.2);border-radius:8px;}
+.historyRow small{color:#ccc;}
 
-/* History list */
-.historyRow{display:flex;justify-content:space-between;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-.historyRow small{color:var(--muted)}
-
-/* Neon markers */
-.markerPulse{position:absolute; width:30px;height:30px;border-radius:50%; display:flex;align-items:center;justify-content:center;color:#021;font-weight:800;transform:translate(-50%,-50%); pointer-events:none; z-index:15; box-shadow:0 0 20px rgba(0,255,156,0.12), inset 0 2px 4px rgba(255,255,255,0.05);animation:pulse 900ms ease-out forwards;}
-.markerBuy{background:linear-gradient(135deg,var(--neon-green), rgba(0,255,156,0.45))}
-.markerSell{background:linear-gradient(135deg,var(--neon-gold), rgba(255,209,102,0.12)); color:#031}
-@keyframes pulse{0%{transform:translate(-50%,-50%) scale(0.4);opacity:0}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+/* Tabel mic date */
+#miniTable{width:100%;max-height:200px;overflow-y:auto;border-radius:var(--radius);background:rgba(0,0,0,0.2);margin-top:10px;}
+#miniTable table{width:100%;border-collapse:collapse;color:#fff;font-size:0.9em;}
+#miniTable th, #miniTable td{padding:6px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);}
+#miniTable thead th{position:sticky;top:0;background:rgba(0,255,200,0.15);color:#000;}
 
 /* Tooltip */
-.tooltip{position:absolute;padding:8px 10px;background:rgba(2,6,12,0.9);border-radius:6px;border:1px solid rgba(255,255,255,0.03);font-size:13px;color:var(--neon-blue);pointer-events:none;transform:translate(-50%,-140%);white-space:nowrap;z-index:30;opacity:0;transition:opacity .12s}
-
-/* Responsive */
-@media(max-width:1000px){
-  #app{flex-direction:column;padding:12px}
-  #left,#right{flex:unset;width:100%}
-  #right{order:2}
-}
+.tooltip{position:absolute;background:rgba(0,0,0,0.85);color:var(--neon-blue);padding:5px 8px;border-radius:6px;font-size:0.8em;pointer-events:none;opacity:0;transition:opacity 0.15s;}
 </style>
 </head>
 <body>
 
-<h1>NEON TRADER SIMULATOR</h1>
+<h1>NEON TRADER</h1>
+<h2>Simulator Ultra-Real BTC / USD</h2>
 
-<div id="app">
-  <!-- Left: Chart -->
+<div id="container">
+  <!-- LEFT: Chart + Controls -->
   <div id="left">
-    <div class="header">
-      <div class="brand">
-        <div class="logo">NT</div>
-        <div>
-          <div style="font-weight:800;color:var(--neon-gold)">BTC / USD</div>
-          <div style="font-size:12px;color:var(--muted)">Live • Demo Mode</div>
-        </div>
-      </div>
-      <div class="meta">Simulated & Realistic</div>
+    <div class="topControls">
+      <select id="selSymbol" class="select">
+        <option value="BTCUSD">BTC / USD</option>
+        <option value="ETHUSD">ETH / USD</option>
+      </select>
+      <select id="selInterval" class="select">
+        <option value="1">1m</option>
+        <option value="5">5m</option>
+        <option value="60">1h</option>
+      </select>
+      <button id="btnMA" class="smallBtn">MA10</button>
+      <button id="btnReset" class="smallBtn">Reset</button>
     </div>
-    <div id="chartWrap">
-      <div class="topControls">
-        <select id="selSymbol" class="select">
-          <option value="BTCUSD">BTC / USD</option>
-        </select>
-        <select id="selInterval" class="select">
-          <option value="1">1m</option>
-          <option value="5">5m</option>
-        </select>
-        <button id="btnMA" class="smallBtn">MA10</button>
-        <button id="btnReset" class="smallBtn">Reset</button>
-      </div>
-      <div id="chart"></div>
-      <div id="tooltip" class="tooltip"></div>
+    <div id="chart"></div>
+
+    <div id="miniTable">
+      <table>
+        <thead>
+          <tr><th>Zi</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr>
+        </thead>
+        <tbody id="miniData"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Right: Panel -->
+  <!-- RIGHT: Panel -->
   <div id="right">
-    <div class="panelCard balance">
-      <div style="font-size:13px;color:var(--muted)">Account</div>
-      <div id="balanceText" style="margin-top:6px;font-size:20px">USD <span style="color:var(--neon-gold)">$1000.00</span> • BTC <span style="color:var(--neon-green)">0.00000</span></div>
-      <div class="kpi">
-        <div>Equity <div style="font-weight:700;color:var(--neon-blue)">$1000</div></div>
-        <div>Open <div style="font-weight:700;color:var(--muted)">0</div></div>
+    <div class="balance" id="balanceText">USD $1000.00 • BTC 0.00000</div>
+    <div class="kpi"><div>Equity: $1000</div><div>Open: 0</div></div>
+
+    <div>
+      <input id="tradeAmount" class="input" placeholder="Amount USD">
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button id="buyBtn" class="btnBuy">BUY</button>
+        <button id="sellBtn" class="btnSell">SELL</button>
+      </div>
+      <div style="margin-top:6px;">
+        <button id="btnSimFast" class="smallBtn">Simulate x2</button>
+        <button id="btnClear" class="smallBtn">Clear Trades</button>
       </div>
     </div>
 
-    <div class="panelCard tradeBox">
-      <label style="font-size:12px;color:var(--muted)">Amount to trade (USD)</label>
-      <input id="tradeAmount" class="input" type="text" placeholder="Ex: 100" />
-      <div class="actionRow">
-        <button id="buyBtn" class="btn btnBuy">BUY</button>
-        <button id="sellBtn" class="btn btnSell">SELL</button>
-      </div>
-    </div>
-
-    <div class="panelCard" style="flex:1;overflow:auto">
-      <h3 style="margin:0 0 8px;color:var(--neon-gold)">Trade History</h3>
-      <div id="historyList" style="max-height:360px;overflow:auto"></div>
-    </div>
+    <div id="history"></div>
   </div>
 </div>
 
-<!-- Scripts -->
+<audio id="sndCoin" src="https://www.soundjay.com/misc/sounds/coin-drop-1.mp3" preload="auto"></audio>
+
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
+// Chart
 const chartDiv = document.getElementById('chart');
-const tooltip = document.getElementById('tooltip');
-const balanceText = document.getElementById('balanceText');
-const historyList = document.getElementById('historyList');
-
-const chart = LightweightCharts.createChart(chartDiv,{
+const chart = LightweightCharts.createChart(chartDiv, {
   layout:{background:'#071018',textColor:'#cfeff6'},
-  timeScale:{borderColor:'rgba(255,255,255,0.03)'},
   rightPriceScale:{borderColor:'rgba(255,255,255,0.03)'},
-  crosshair:{mode: LightweightCharts.CrosshairMode.Normal},
-  handleScroll:{mouseWheel:true,pressedMouseMove:true},
-  handleScale:{axisPressedMouseMove:true,pinch:true}
+  timeScale:{borderColor:'rgba(255,255,255,0.03)'}
 });
-const candleSeries = chart.addCandlestickSeries({
-  upColor:'#00ff9c', downColor:'#ffb86b', borderVisible:true, wickVisible:true, borderColor:'#ffffff10', wickColor:'#ffffff10'
-});
-const maSeries = chart.addLineSeries({ color:'#ffd166', lineWidth:2 });
-
-let data = [];
-let lastTime = Math.floor(Date.now()/1000/60)*60;
-let balanceUSD=1000, balanceBTC=0;
-let trades=[], markers=[];
-function formatNumber(n,dec=2){return Number(n).toFixed(dec);}
-function updateBalanceUI(){
-  balanceText.innerHTML=`USD <span style="color:var(--neon-gold)">$${formatNumber(balanceUSD,2)}</span> • BTC <span style="color:var(--neon-green)">${formatNumber(balanceBTC,5)}</span>`;
-}
-
-function seedData(){
-  data=[]; let price=58000 + Math.random()*4000;
-  for(let i=60;i>0;i--){
-    const t=lastTime-i*60;
-    const open=price;
-    const close=open+(Math.random()-0.5)*1200;
-    const high=Math.max(open,close)+Math.random()*200;
-    const low=Math.min(open,close)-Math.random()*200;
-    data.push({time:t,open,high,low,close});
-    price=close;
-  }
-  candleSeries.setData(data);
-  maSeries.setData(calcMA(10));
-}
+const candleSeries = chart.addCandlestickSeries({upColor:'#00ff88',downColor:'#ff6b6b',borderColor:'#ffffff20',wickColor:'#ffffff20'});
+let data=[], lastTime=Math.floor(Date.now()/1000/60)*60;
+function seedData(){data=[];let price=58000+Math.random()*3000;
+for(let i=60;i>0;i--){const t=lastTime-i*60;const open=price;const close=open+(Math.random()-0.5)*1200;const high=Math.max(open,close)+Math.random()*200;const low=Math.min(open,close)-Math.random()*200;
+data.push({time:t,open,high,low,close});price=close;} candleSeries.setData(data); populateMiniTable();}
 seedData();
 
-function calcMA(period=10){
-  if(data.length<period) return [];
-  const ma=[];
-  for(let i=period-1;i<data.length;i++){
-    let sum=0;
-    for(let j=0;j<period;j++) sum+=data[i-j].close;
-    ma.push({time:data[i].time,value:sum/period});
-  }
-  return ma;
-}
+// Mini table
+function populateMiniTable(){const tbody=document.getElementById('miniData');tbody.innerHTML='';data.slice(-50).forEach((d,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${d.open.toFixed(2)}</td><td>${d.high.toFixed(2)}</td><td>${d.low.toFixed(2)}</td><td>${d.close.toFixed(2)}</td>`;tbody.appendChild(tr);});}
 
-function appendBar(){
-  const last=data[data.length-1];
-  const t=last.time+(parseInt(document.getElementById('selInterval').value)||1)*60;
-  const open=last.close;
-  const close=open+(Math.random()-0.5)*1400;
-  const high=Math.max(open,close)+Math.random()*300;
-  const low=Math.min(open,close)-Math.random()*300;
-  const bar={time:t,open,high,low,close};
-  data.push(bar);
-  if(data.length>200) data.shift();
-  candleSeries.setData(data);
-  maSeries.setData(calcMA(10));
-  lastTime=t;
-}
-let liveTimer=setInterval(appendBar,2000);
+// Account
+let balanceUSD=1000,balanceBTC=0,trades=[];
+function updateBalance(){document.getElementById('balanceText').innerHTML=`USD <span style="color:#ffc300">$${balanceUSD.toFixed(2)}</span> • BTC <span style="color:#00ff88">${balanceBTC.toFixed(5)}</span>`;}
+updateBalance();
 
+// Trades
+function playSound(){document.getElementById('sndCoin').currentTime=0;document.getElementById('sndCoin').play();}
 function execute(type){
-  const amtRaw=document.getElementById('tradeAmount').value.trim();
-  const amt=parseFloat((amtRaw||'0').replace(/,/g,'')); if(!amt||amt<=0){alert('Introduce o sumă validă');return;}
-  const last=data[data.length-1]; const price=last.close;
-  if(type==='Buy'){
-    if(amt>balanceUSD){alert('Fonduri insuficiente');return;}
-    const btc=amt/price; balanceUSD-=amt; balanceBTC+=btc;
-    const trade={time:last.time,type:'Buy',price,usd:amt,btc}; trades.push(trade); addHistoryRow(trade);
-  }else{
-    const btcNeeded=amt/price; if(btcNeeded>balanceBTC){alert('Nu ai suficient BTC');return;}
-    balanceBTC-=btcNeeded; balanceUSD+=amt;
-    const trade={time:last.time,type:'Sell',price,usd:amt,btc:btcNeeded}; trades.push(trade); addHistoryRow(trade);
-  }
-  updateBalanceUI();
-}
+const amt=parseFloat(document.getElementById('tradeAmount').value)||0;if(!amt){alert('Introdu o sumă validă');return;}
+const last=data[data.length-1];const price=last.close;if(type==='Buy'){if(amt>balanceUSD){alert('Fonduri insuficiente');return;}
+const btc=amt/price;balanceUSD-=amt;balanceBTC+=btc;trades.push({type:'Buy',price,usd:amt,btc});playSound();addHistory('Buy',amt,btc,price);} 
+else {const btcNeeded=amt/price;if(btcNeeded>balanceBTC){alert('Nu ai suficient BTC');return;}balanceBTC-=btcNeeded;balanceUSD+=amt;trades.push({type:'Sell',price,usd:amt,btc:btcNeeded});playSound();addHistory('Sell',amt,btcNeeded,price);}
+updateBalance();}
 
-function addHistoryRow(tr){
-  const row=document.createElement('div'); row.className='historyRow';
-  row.innerHTML=`
-    <div><strong style="color:${tr.type==='Buy'? 'var(--neon-green)':'var(--neon-gold)'}">${tr.type}</strong>
-    <div><small>${new Date(tr.time*1000).toLocaleTimeString()}</small></div></div>
-    <div style="text-align:right">
-    <div><strong>${tr.usd.toFixed(2)} USD</strong></div>
-    <div><small>${tr.btc.toFixed(5)} BTC • @ ${tr.price.toFixed(2)}</small></div>
-    </div>
-  `;
-  historyList.prepend(row);
-  if(historyList.children.length>80) historyList.removeChild(historyList.lastChild);
-}
+function addHistory(type,usd,btc,price){
+const hist=document.getElementById('history');const row=document.createElement('div');row.className='historyRow';
+row.innerHTML=`<div><strong style="color:${type==='Buy'?'#00ff88':'#ffc300'}">${type}</strong><div><small>${new Date().toLocaleTimeString()}</small></div></div><div style="text-align:right"><div><strong>${usd.toFixed(2)} USD</strong></div><div><small>${btc.toFixed(5)} BTC @ ${price.toFixed(2)}</small></div></div>`;
+hist.prepend(row);if(hist.children.length>50)hist.removeChild(hist.lastChild);}
 
+// Buttons
 document.getElementById('buyBtn').addEventListener('click',()=>execute('Buy'));
 document.getElementById('sellBtn').addEventListener('click',()=>execute('Sell'));
-document.getElementById('btnReset').addEventListener('click',()=>{
-  trades=[]; markers=[]; candleSeries.setMarkers([]); historyList.innerHTML=''; balanceUSD=1000; balanceBTC=0; seedData(); updateBalanceUI();
-});
-document.getElementById('btnMA').addEventListener('click',()=>{
-  const shown=maSeries.options().visible;
-  maSeries.applyOptions({visible:!shown});
-});
-
-updateBalanceUI();
+document.getElementById('btnClear').addEventListener('click',()=>{trades=[];balanceUSD=1000;balanceBTC=0;updateBalance();document.getElementById('history').innerHTML='';});
+document.getElementById('btnReset').addEventListener('click',()=>{seedData();trades=[];balanceUSD=1000;balanceBTC=0;updateBalance();document.getElementById('history').innerHTML='';});
 </script>
+
 </body>
 </html>
